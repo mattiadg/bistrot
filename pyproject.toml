@@ -1,0 +1,65 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "bistrot"
+description = 'A cli tool that transforms any Python function into an endpoint'
+readme = "README.md"
+requires-python = ">=3.8"
+license = "MIT"
+keywords = []
+authors = [
+  { name = "Mattia Di Gangi", email = "mattiadigangi@gmail.com" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = [
+  "flask",
+]
+dynamic = ["version"]
+
+[project.urls]
+Documentation = "https://github.com/mattiadg/bistrot#readme"
+Issues = "https://github.com/mattiadg/bistrot/issues"
+Source = "https://github.com/mattiadg/bistrot"
+
+[tool.hatch.version]
+path = "__about__.py"
+
+[tool.hatch.envs.default]
+dependencies = [
+  "mypy",
+  "pytest",
+  "pytest-cov",
+]
+[tool.hatch.envs.default.scripts]
+cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=bistrot --cov=tests {args}"
+no-cov = "cov --no-cov {args}"
+run_mypy = "mypy ."
+
+[[tool.hatch.envs.test.matrix]]
+python = ["38", "39", "310", "311", "312"]
+
+[tool.coverage.run]
+branch = true
+parallel = true
+omit = [
+  "bistrot/__about__.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
