@@ -2,9 +2,10 @@
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+
 [project]
 name = "bistrot"
-description = 'A cli tool that transforms any Python function into an endpoint'
+description = 'A cli tool that makes any Python function an executable'
 readme = "README.md"
 requires-python = ">=3.8"
 license = "MIT"
@@ -23,9 +24,7 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: CPython",
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
-dependencies = [
-  "flask",
-]
+dependencies = []
 dynamic = ["version"]
 
 [project.urls]
@@ -33,17 +32,21 @@ Documentation = "https://github.com/mattiadg/bistrot#readme"
 Issues = "https://github.com/mattiadg/bistrot/issues"
 Source = "https://github.com/mattiadg/bistrot"
 
+[project.scripts]
+bistrot = "src.bistrot.bistrot:main"
+
 [tool.hatch.version]
-path = "__about__.py"
+path = "src/bistrot/__about__.py"
 
 [tool.hatch.envs.default]
 dependencies = [
+  "requests",
   "mypy",
   "pytest",
   "pytest-cov",
 ]
 [tool.hatch.envs.default.scripts]
-cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=bistrot --cov=tests {args}"
+cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=src/bistrot --cov=tests {args} --capture=sys"
 no-cov = "cov --no-cov {args}"
 run_mypy = "mypy ."
 
@@ -54,7 +57,8 @@ python = ["38", "39", "310", "311", "312"]
 branch = true
 parallel = true
 omit = [
-  "bistrot/__about__.py",
+  "src/bistrot/__about__.py",
+  "src/bistrot/__main__.py",
 ]
 
 [tool.coverage.report]
