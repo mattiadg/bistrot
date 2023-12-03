@@ -17,5 +17,5 @@ def times2(x: float) -> float:
     return x * 2
 
 
-def printpath() -> str:
+def printpath() -> list[str]:
     return sys.path

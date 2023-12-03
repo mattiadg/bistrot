@@ -1,6 +1,6 @@
 import pytest
 
-from src.bistrot.bistrot import bistrot_exec, make_parser, Function
+from bistrot.bistrot import bistrot_exec, make_parser, Function
 
 
 def func1(a: int, b: int) -> int:

@@ -33,7 +33,10 @@ Issues = "https://github.com/mattiadg/bistrot/issues"
 Source = "https://github.com/mattiadg/bistrot"
 
 [project.scripts]
-bistrot = "src.bistrot.bistrot:main"
+bistrot = "bistrot.bistrot:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/bistrot"]
 
 [tool.hatch.version]
 path = "src/bistrot/__about__.py"

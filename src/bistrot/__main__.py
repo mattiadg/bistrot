@@ -1,3 +1,3 @@
-from src.bistrot.bistrot import main
+from bistrot.bistrot import main
 
 main()

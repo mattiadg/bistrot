@@ -55,7 +55,7 @@ def get_function_with_error_message(module, func_name: str) ->  Callable:
     return func
 
 
-def make_parser(func: Callable):
+def make_parser(func: Function):
     parser = argparse.ArgumentParser(func.name)
     for arg_name, par in func.arguments.parameters.items():
         parser.add_argument(f"--{arg_name}", type=par.annotation, help=f"type: {par.annotation}")
