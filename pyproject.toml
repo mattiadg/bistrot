@@ -43,13 +43,13 @@ path = "src/bistrot/__about__.py"
 
 [tool.hatch.envs.default]
 dependencies = [
-  "requests",
+  "black",
   "mypy",
   "pytest",
   "pytest-cov",
 ]
 [tool.hatch.envs.default.scripts]
-cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=src/bistrot --cov=tests {args} --capture=sys"
+cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=bistrot --cov=tests {args} --capture=sys"
 no-cov = "cov --no-cov {args}"
 run_mypy = "mypy ."
 

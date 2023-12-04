@@ -19,12 +19,20 @@ class Function:
         object.__setattr__(self, "arguments", inspect.signature(self.f))
 
 
+class FunctionNotFound(Exception):
+    pass
+
+
+class ClassNotFound(Exception):
+    pass
+
+
 def bistrot_exec(name: str, args: Sequence[str]):
     module_name, func_name = name.split(":")
     m = importlib_with_error_message(module_name)
     func = get_function_with_error_message(m, func_name)
     f = Function(f=func)
-    parser = make_parser(f)
+    parser = make_argparser(f)
     args, remaining = parser.parse_known_args(args)
     if remaining:
         parser.print_help()
@@ -47,18 +55,38 @@ def importlib_with_error_message(module_name: str):
     return m
 
 
-def get_function_with_error_message(module, func_name: str) ->  Callable:
-    try:
-        func = getattr(module, func_name)
-    except AttributeError as e:
-        raise AttributeError(f" There is no function called {func_name} in module {module.__name__}") from e
+def get_function_with_error_message(module, func_name: str) -> Callable:
+    if "." not in func_name:
+        try:
+            func = getattr(module, func_name)
+        except AttributeError as e:
+            raise FunctionNotFound(
+                f" There is no function called {func_name} in module {module.__name__}"
+            ) from e
+    else:
+        klass_name, f_name = func_name.split(".")
+        try:
+            klass = getattr(module, klass_name)
+        except AttributeError as e:
+            raise ClassNotFound(
+                f" There is no class called {klass_name} in module {module.__name__}"
+            ) from e
+        try:
+            func = getattr(klass, f_name)
+        except AttributeError as e:
+            raise FunctionNotFound(
+                f" There is no function called {f_name} in class {klass_name} in module {module.__name__}"
+            ) from e
+
     return func
 
 
-def make_parser(func: Function):
+def make_argparser(func: Function):
     parser = argparse.ArgumentParser(func.name)
     for arg_name, par in func.arguments.parameters.items():
-        parser.add_argument(f"--{arg_name}", type=par.annotation, help=f"type: {par.annotation}")
+        parser.add_argument(
+            f"--{arg_name}", type=par.annotation, help=f"type: {par.annotation}"
+        )
     return parser
 
 
@@ -66,5 +94,5 @@ def main():
     print(bistrot_exec(sys.argv[1], sys.argv[2:]))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())
