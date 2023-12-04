@@ -59,7 +59,7 @@ def test_bistrot_exec_wrong_root_module():
 
 
 def test_bistrot_exec_wrong_args():
-    with pytest.raises(SystemExit) as err:
+    with pytest.raises(SystemExit):
         bistrot_exec("tests.test_bistrot:func1", ("--x", "1", "--b", "2"))
 
 
