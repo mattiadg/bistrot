@@ -89,6 +89,7 @@ def test_bistrot_exec_static_method_function_not_found():
 
 def test_bistrot_exec_variable():
     from bistrot import __version__
+
     version = bistrot_exec("bistrot:__version__", ())
     assert __version__ == version
 

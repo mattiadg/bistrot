@@ -1,6 +1,7 @@
 import argparse
 import importlib
 import inspect
+import os
 import sys
 from dataclasses import dataclass, field
 from typing import Sequence, Callable
@@ -31,7 +32,7 @@ def bistrot_exec(name: str, args: Sequence[str]):
     module_name, func_name = name.split(":")
     m = importlib_with_error_message(module_name)
     func = get_function_with_error_message(m, func_name)
-    if isinstance(func, Callable):
+    if callable(func):
         f = Function(f=func)
         parser = make_argparser(f)
         args, remaining = parser.parse_known_args(args)
@@ -94,7 +95,8 @@ def make_argparser(func: Function):
 
 
 def main():
-    print(bistrot_exec(sys.argv[1], sys.argv[2:]))
+    sys.path.append(os.getcwd())
+    print(f"bistrot> {bistrot_exec(sys.argv[1], sys.argv[2:])}")
 
 
 if __name__ == "__main__":
