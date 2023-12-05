@@ -45,9 +45,17 @@ bistrot> 0.1.0
 
 ## Install
 Bistrot is on pypi and it has no dependencies! Install it simply with
-```commandline
-pip install bistrot
+```bash
+$ pip install bistrot
 ```
+
+Or you may want to install it with `pipx` for global usage
+
+```bash
+$ pipx install bistrot
+$ bistrot <cmds>
+```
+
 ## Warning
 This project is still experimental and is guaranteed to work only with primitive Python types.
 
