@@ -50,3 +50,9 @@ pip install bistrot
 ```
 ## Warning
 This project is still experimental and is guaranteed to work only with primitive Python types.
+
+## Links
+
+---
+- Source Code: https://github.com/mattiadg/bistrot
+- PyPI Releases: https://pypi.org/project/bistrot/
