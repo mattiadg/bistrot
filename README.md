@@ -18,7 +18,7 @@ We can call this function from the command line using **bistrot**:
 
 ```bash
 $ bistrot examples.ops:add --x=2 --y=3
-5
+bistrot> 5
 ```
 
 It also works with static and class methods
@@ -34,13 +34,13 @@ class UsefulClass:
 
 ```bash
 $ bistrot examples.klass:UsefulClass.version
-0.1.0
+bistrot> 0.1.0
 ```
 
 The same result can be achieved by targeting directly the `__version__` variable:
 ```bash
 $ bistrot bistrot:__version__
-0.1.0
+bistrot> 0.1.0
 ```
 
 ## Warning
