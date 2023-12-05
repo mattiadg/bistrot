@@ -31,13 +31,16 @@ def bistrot_exec(name: str, args: Sequence[str]):
     module_name, func_name = name.split(":")
     m = importlib_with_error_message(module_name)
     func = get_function_with_error_message(m, func_name)
-    f = Function(f=func)
-    parser = make_argparser(f)
-    args, remaining = parser.parse_known_args(args)
-    if remaining:
-        parser.print_help()
-        parser.error(f"Unrecognized arguments {list(remaining)}")
-    return f.f(**vars(args))
+    if isinstance(func, Callable):
+        f = Function(f=func)
+        parser = make_argparser(f)
+        args, remaining = parser.parse_known_args(args)
+        if remaining:
+            parser.print_help()
+            parser.error(f"Unrecognized arguments {list(remaining)}")
+        return f.f(**vars(args))
+    else:  # Not a callable, it is a constant value
+        return func
 
 
 def importlib_with_error_message(module_name: str):

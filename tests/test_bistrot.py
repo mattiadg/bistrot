@@ -87,6 +87,12 @@ def test_bistrot_exec_static_method_function_not_found():
     assert "bstaticmethod" in str(err)
 
 
+def test_bistrot_exec_variable():
+    from bistrot import __version__
+    version = bistrot_exec("bistrot:__version__", ())
+    assert __version__ == version
+
+
 def test_make_parser_good():
     f = Function(f=func1)
     parser = make_argparser(f)
