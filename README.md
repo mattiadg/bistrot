@@ -34,13 +34,13 @@ class UsefulClass:
 
 ```bash
 $ bistrot examples.klass:UsefulClass.version
-bistrot> 0.1.0
+bistrot> 0.1.0a0
 ```
 
 The same result can be achieved by targeting directly the `__version__` variable:
 ```bash
 $ bistrot bistrot:__version__
-bistrot> 0.1.0
+bistrot> 0.1.0a0
 ```
 
 ## Install
@@ -54,6 +54,12 @@ Or you may want to install it with `pipx` for global usage
 ```bash
 $ pipx install bistrot
 $ bistrot <cmds>
+```
+
+And verify your installation with 
+```bash
+$ bistrot --version
+bistrot> 0.1.0a0
 ```
 
 ## Warning

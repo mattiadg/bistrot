@@ -6,6 +6,8 @@ import sys
 from dataclasses import dataclass, field
 from typing import Sequence, Callable
 
+import bistrot
+
 
 @dataclass(frozen=True)
 class Function:
@@ -94,9 +96,16 @@ def make_argparser(func: Function):
     return parser
 
 
+def prompt_print(s: str):
+    print(f"bistrot> {s}")
+
+
 def main():
     sys.path.append(os.getcwd())
-    print(f"bistrot> {bistrot_exec(sys.argv[1], sys.argv[2:])}")
+    if "--version" or "-v" in sys.argv:
+        prompt_print(bistrot.version)
+    else:
+        prompt_print(bistrot_exec(sys.argv[1], sys.argv[2:]))
 
 
 if __name__ == "__main__":
