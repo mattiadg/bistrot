@@ -7,7 +7,7 @@ build-backend = "hatchling.build"
 name = "bistrot"
 description = 'A cli tool that makes any Python function an executable'
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.8,<3.12"
 license = "MIT"
 keywords = []
 authors = [
@@ -20,7 +20,6 @@ classifiers = [
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
-  "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: Implementation :: CPython",
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
@@ -55,7 +54,7 @@ no-cov = "cov --no-cov {args}"
 run_mypy = "mypy ."
 
 [[tool.hatch.envs.test.matrix]]
-python = ["38", "39", "310", "311", "312"]
+python = ["38", "39", "310", "311"]
 
 [tool.coverage.run]
 branch = true
