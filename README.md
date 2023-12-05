@@ -43,5 +43,10 @@ $ bistrot bistrot:__version__
 bistrot> 0.1.0
 ```
 
+## Install
+Bistrot is on pypi and it has no dependencies! Install it simply with
+```commandline
+pip install bistrot
+```
 ## Warning
 This project is still experimental and is guaranteed to work only with primitive Python types.
