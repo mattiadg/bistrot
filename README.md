@@ -1,4 +1,5 @@
 # Bistrot
+# ![A chef drawing](https://c1.staticflickr.com/5/4054/4474884936_0dea8212d2.jpg)
 A cli tool that transforms any Python function into an executable, or can easily print any constant in a codebase or 
 library
 
@@ -41,6 +42,12 @@ The same result can be achieved by targeting directly the `__version__` variable
 ```bash
 $ bistrot bistrot:__version__
 bistrot> 0.1.0a1
+```
+
+It is also possible to call methods on strings
+```bash
+$ bistrot '{\"hello\"}:upper'
+bistrot> HELLO
 ```
 
 ## Install

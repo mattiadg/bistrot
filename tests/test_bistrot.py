@@ -8,6 +8,7 @@ from bistrot.bistrot import (
     Function,
     ClassNotFound,
     FunctionNotFound,
+    ParsingError,
 )
 
 
@@ -63,6 +64,11 @@ def test_bistrot_exec_wrong_args():
         bistrot_exec("tests.test_bistrot:func1", ("--x", "1", "--b", "2"))
 
 
+def test_bistrot_exec_missing_colon():
+    with pytest.raises(ParsingError):
+        bistrot_exec("tests.test_bistrot.func1", ("--x", "1", "--b", "2"))
+
+
 def test_bistrot_exec_static_method_ok():
     result = bistrot_exec("tests.test_bistrot:AClass.astaticmethod", ("--x", "2.0"))
     assert result == 8.0
@@ -92,6 +98,28 @@ def test_bistrot_exec_variable():
 
     version = bistrot_exec("bistrot:__version__", ())
     assert __version__ == version
+
+
+def test_bistrot_exec_value():
+    result = bistrot_exec('{"hello"}:upper', ())
+    assert result == "HELLO"
+
+
+def test_bistrot_exec_value_nonclosed_curly():
+    with pytest.raises(ParsingError) as err:
+        bistrot_exec('{"hello":upper', ())
+
+    assert "missing \"}\"" in str(err)
+
+
+def test_bistrot_exec_value_wrong_open_curly():
+    with pytest.raises(ParsingError):
+        bistrot_exec('"he{llo":upper', ())
+
+
+def test_bistrot_exec_value_wrong_closed_curly():
+    with pytest.raises(ParsingError):
+        bistrot_exec('"hell}o":upper', ())
 
 
 def test_make_parser_good():

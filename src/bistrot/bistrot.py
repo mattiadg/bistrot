@@ -4,7 +4,7 @@ import inspect
 import os
 import sys
 from dataclasses import dataclass, field
-from typing import Sequence, Callable
+from typing import Sequence, Callable, Any
 
 import bistrot
 
@@ -30,20 +30,49 @@ class ClassNotFound(Exception):
     pass
 
 
+class ParsingError(Exception):
+    pass
+
+
 def bistrot_exec(name: str, args: Sequence[str]):
-    module_name, func_name = name.split(":")
+    try:
+        module_name, func_name = name.split(":")
+    except ValueError as err:
+        raise ParsingError("Missing colon (:) to separate module and function!") from err
+    if "{" in module_name and "}" not in module_name:
+        raise ParsingError("Found \"{\" but missing \"}\"")
+    if "{" in module_name and not module_name.startswith("{"):
+        raise ParsingError("Symbol \"{\" must start a command if present")
+    if "}" in module_name and not module_name.endswith("}"):
+        raise ParsingError("Symbol \"}\" must end a module name if present")
+    if "{" in module_name:
+        return exec_value_function(module_name[1:-1], func_name, args)
+    return exec_module_func(module_name, func_name, args)
+
+
+def exec_module_func(module_name: str, func_name: str, args: Sequence[str]) -> Any:
     m = importlib_with_error_message(module_name)
     func = get_function_with_error_message(m, func_name)
     if callable(func):
-        f = Function(f=func)
-        parser = make_argparser(f)
-        args, remaining = parser.parse_known_args(args)
-        if remaining:
-            parser.print_help()
-            parser.error(f"Unrecognized arguments {list(remaining)}")
-        return f.f(**vars(args))
+        return exec_func(func, args)
     else:  # Not a callable, it is a constant value
         return func
+
+
+def exec_value_function(value_name: str, func_name: str, args: Sequence[str]) -> Any:
+    if value_name.startswith("\"") and value_name.endswith("\""):
+        method = getattr(value_name[1:-1], func_name)
+        return exec_func(method, args)
+
+
+def exec_func(func, args):
+    f = Function(f=func)
+    parser = make_argparser(f)
+    args, remaining = parser.parse_known_args(args)
+    if remaining:
+        parser.print_help()
+        parser.error(f"Unrecognized arguments {list(remaining)}")
+    return f.f(**vars(args))
 
 
 def importlib_with_error_message(module_name: str):
@@ -102,7 +131,7 @@ def prompt_print(s: str):
 
 def main():
     sys.path.append(os.getcwd())
-    if "--version" or "-v" in sys.argv:
+    if "--version" in sys.argv or "-v" in sys.argv:
         prompt_print(bistrot.version)
     else:
         prompt_print(bistrot_exec(sys.argv[1], sys.argv[2:]))
