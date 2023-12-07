@@ -109,7 +109,7 @@ def test_bistrot_exec_value_nonclosed_curly():
     with pytest.raises(ParsingError) as err:
         bistrot_exec('{"hello":upper', ())
 
-    assert "missing \"}\"" in str(err)
+    assert 'missing "}"' in str(err)
 
 
 def test_bistrot_exec_value_wrong_open_curly():

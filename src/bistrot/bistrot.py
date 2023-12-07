@@ -4,6 +4,7 @@ import inspect
 import os
 import sys
 from dataclasses import dataclass, field
+from textwrap import dedent
 from typing import Sequence, Callable, Any
 
 import bistrot
@@ -38,13 +39,15 @@ def bistrot_exec(name: str, args: Sequence[str]):
     try:
         module_name, func_name = name.split(":")
     except ValueError as err:
-        raise ParsingError("Missing colon (:) to separate module and function!") from err
+        raise ParsingError(
+            "Missing colon (:) to separate module and function!"
+        ) from err
     if "{" in module_name and "}" not in module_name:
-        raise ParsingError("Found \"{\" but missing \"}\"")
+        raise ParsingError('Found "{" but missing "}"')
     if "{" in module_name and not module_name.startswith("{"):
-        raise ParsingError("Symbol \"{\" must start a command if present")
+        raise ParsingError('Symbol "{" must start a command if present')
     if "}" in module_name and not module_name.endswith("}"):
-        raise ParsingError("Symbol \"}\" must end a module name if present")
+        raise ParsingError('Symbol "}" must end a module name if present')
     if "{" in module_name:
         return exec_value_function(module_name[1:-1], func_name, args)
     return exec_module_func(module_name, func_name, args)
@@ -60,7 +63,7 @@ def exec_module_func(module_name: str, func_name: str, args: Sequence[str]) -> A
 
 
 def exec_value_function(value_name: str, func_name: str, args: Sequence[str]) -> Any:
-    if value_name.startswith("\"") and value_name.endswith("\""):
+    if value_name.startswith('"') and value_name.endswith('"'):
         method = getattr(value_name[1:-1], func_name)
         return exec_func(method, args)
 
@@ -129,12 +132,39 @@ def prompt_print(s: str):
     print(f"bistrot> {s}")
 
 
+def cli_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        "bistrot - Cook your Python programs and serve them back to you"
+    )
+    parser.add_argument(
+        "-v", "--version", action="store_true", help="Print software version"
+    )
+    parser.add_argument(
+        "cmd",
+        help=dedent(
+            """\
+            Command to execute.
+            It must be in one of the following formats:
+            "path.to.module:foo"  --- executes "foo" inside module |
+            {"astring"}:foo --- executes method foo for string "astring" |
+            "path.to.module:Class.foo" --- executes static or class method "foo" of class "Class" 
+            """
+        ),
+    )
+    parser.add_argument(
+        "args", nargs="*", help="flag=value pairs for the function arguments"
+    )
+    return parser
+
+
 def main():
     sys.path.append(os.getcwd())
     if "--version" in sys.argv or "-v" in sys.argv:
-        prompt_print(bistrot.version)
+        prompt_print(bistrot.__version__)
     else:
-        prompt_print(bistrot_exec(sys.argv[1], sys.argv[2:]))
+        parser = cli_parser()
+        known_args, rest = parser.parse_known_args()
+        prompt_print(bistrot_exec(known_args.cmd, rest))
 
 
 if __name__ == "__main__":
