@@ -22,6 +22,14 @@ $ bistrot examples.ops:add --x=2 --y=3
 bistrot> 5
 ```
 
+Or it can use positional arguments if they are defined as such in the function:
+```bash
+$ bistrot examples.ops:add 2 3
+bistrot> 5
+```
+
+However, the mandatory arguments must all be either positional or named in a cli call.
+
 It also works with static and class methods
 ```python
 #examples/klass.py

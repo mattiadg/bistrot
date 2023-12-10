@@ -1,3 +1,4 @@
+import sys
 from dataclasses import dataclass
 
 import pytest
@@ -94,10 +95,8 @@ def test_bistrot_exec_static_method_function_not_found():
 
 
 def test_bistrot_exec_variable():
-    from bistrot import __version__
-
-    version = bistrot_exec("bistrot:__version__", ())
-    assert __version__ == version
+    path = bistrot_exec("sys:path", ())
+    assert path == sys.path
 
 
 def test_bistrot_exec_value():

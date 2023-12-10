@@ -7,8 +7,6 @@ from dataclasses import dataclass, field
 from textwrap import dedent
 from typing import Sequence, Callable, Any
 
-import bistrot
-
 
 @dataclass(frozen=True)
 class Function:
@@ -71,10 +69,7 @@ def exec_value_function(value_name: str, func_name: str, args: Sequence[str]) ->
 def exec_func(func, args):
     f = Function(f=func)
     parser = make_argparser(f)
-    args, remaining = parser.parse_known_args(args)
-    if remaining:
-        parser.print_help()
-        parser.error(f"Unrecognized arguments {list(remaining)}")
+    args = parser.parse_args(args)
     return f.f(**vars(args))
 
 
@@ -119,12 +114,31 @@ def get_function_with_error_message(module, func_name: str) -> Callable:
     return func
 
 
+class PosOrOptAction(argparse.Action):
+    def __init__(self, option_strings, dest, **kwargs):
+        super().__init__(option_strings, dest, **kwargs)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        if getattr(namespace, self.dest) is None:
+            setattr(namespace, self.dest, values)
+
+
 def make_argparser(func: Function):
     parser = argparse.ArgumentParser(func.name)
     for arg_name, par in func.arguments.parameters.items():
-        parser.add_argument(
-            f"--{arg_name}", type=par.annotation, help=f"type: {par.annotation}"
-        )
+        kwargs = {"type": par.annotation, "help": f"type: {par.annotation}"}
+        if par.kind == inspect.Parameter.POSITIONAL_ONLY:
+            parser.add_argument(arg_name, **kwargs)
+        elif par.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD:
+            parser.add_argument(arg_name, action=PosOrOptAction, nargs="?", **kwargs)
+            kwargs["help"] = (
+                kwargs["help"] + f"\nSame as positional argument {arg_name}"
+            )
+            parser.add_argument(f"--{arg_name}", action=PosOrOptAction, **kwargs)
+        elif par.kind == inspect.Parameter.KEYWORD_ONLY:
+            parser.add_argument(f"--{arg_name}", **kwargs)
+        else:
+            print(f"There are additional arguments: {arg_name}")
     return parser
 
 
@@ -133,11 +147,17 @@ def prompt_print(s: str):
 
 
 def cli_parser() -> argparse.ArgumentParser:
+    from bistrot.__about__ import version
+
     parser = argparse.ArgumentParser(
         "bistrot - Cook your Python programs and serve them back to you"
     )
     parser.add_argument(
-        "-v", "--version", action="store_true", help="Print software version"
+        "-v",
+        "--version",
+        action="version",
+        version=f"bistrot -- v{version}",
+        help="Print software version",
     )
     parser.add_argument(
         "cmd",
@@ -151,20 +171,14 @@ def cli_parser() -> argparse.ArgumentParser:
             """
         ),
     )
-    parser.add_argument(
-        "args", nargs="*", help="flag=value pairs for the function arguments"
-    )
     return parser
 
 
 def main():
     sys.path.append(os.getcwd())
-    if "--version" in sys.argv or "-v" in sys.argv:
-        prompt_print(bistrot.__version__)
-    else:
-        parser = cli_parser()
-        known_args, rest = parser.parse_known_args()
-        prompt_print(bistrot_exec(known_args.cmd, rest))
+    parser = cli_parser()
+    known_args, rest = parser.parse_known_args(sys.argv[1:])
+    prompt_print(bistrot_exec(known_args.cmd, rest))
 
 
 if __name__ == "__main__":
